@@ -16,9 +16,9 @@ public class SwiftBarcodeFinderPlugin: NSObject, FlutterPlugin {
             }
             if let myArgs = args as? [String: Any]{
                 let filePath = myArgs["filePath"] as! String
-                let barcodeFormats = myArgs["barcodeFormats"] as? [String]
+                let barcodeFormat = myArgs["barcodeFormat"] as? String
                 let url = URL(fileURLWithPath: filePath)
-                let scanner = BarcodeScanner()
+                let scanner = BarcodeFinder()
                 
                 DispatchQueue.global().async {
                     let pdfImages = url.pdfPagesToImages()
@@ -27,9 +27,9 @@ public class SwiftBarcodeFinderPlugin: NSObject, FlutterPlugin {
                             result(FlutterError(code: "not-found" , message: "No barcode found on the file", details: nil))
                             return
                         }
-                        let barcodesToFilter = BarcodeFormatType.createBarcodeFormatTypeFromStrings(strings: barcodeFormats!)
+                        let barcodeToFilter = BarcodeFormatType.createBarcodeFormatTypeFromString(format: barcodeFormat!)
                         for uiImage in pdfImages ?? [UIImage](){
-                            if let barcode =  scanner.tryFindBarcodeFrom(uiImage: uiImage, barcodesToFilter: barcodesToFilter){
+                            if let barcode =  scanner.tryFindBarcodeFrom(uiImage: uiImage, barcodeToFilter: barcodeToFilter){
                                 result(barcode)
                                 return;
                             }
@@ -53,16 +53,16 @@ public class SwiftBarcodeFinderPlugin: NSObject, FlutterPlugin {
             }
             if let myArgs = args as? [String: Any]{
                 let filePath = myArgs["filePath"] as! String
-                let barcodeFormats = myArgs["barcodeFormats"] as? [String]
+                let barcodeFormat = myArgs["barcodeFormat"] as? String
                 let url = URL(fileURLWithPath: filePath)
-                let scanner = BarcodeScanner()
+                let scanner = BarcodeFinder()
                 let uiImage = UIImage.init(contentsOfFile: url.path)
                 if uiImage == nil{
                     result(FlutterError(code: "not-found" , message: "No barcode found on the file", details: nil))
                     return
                 }
-                let barcodesToFilter = BarcodeFormatType.createBarcodeFormatTypeFromStrings(strings: barcodeFormats!)
-                if let barcode =  scanner.tryFindBarcodeFrom(uiImage: uiImage!, barcodesToFilter: barcodesToFilter){
+                let barcodeToFilter = BarcodeFormatType.createBarcodeFormatTypeFromString(format: barcodeFormat!)
+                if let barcode =  scanner.tryFindBarcodeFrom(uiImage: uiImage!, barcodeToFilter: barcodeToFilter){
                     result(barcode)
                     return;
                 }

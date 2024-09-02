@@ -6,14 +6,15 @@
 //
 
 import Foundation
+import MLKitBarcodeScanning
 
-class BarcodeScanner {
+class BarcodeFinder {
     
     var image: UIImage?
-    var barcodesToFilter: [BarcodeFormatType]?
-    func tryFindBarcodeFrom(uiImage: UIImage, barcodesToFilter: [BarcodeFormatType] = [BarcodeFormatType.any]) -> String?{
+    var barcodeToFilter: BarcodeFormat?
+    func tryFindBarcodeFrom(uiImage: UIImage, barcodeToFilter: BarcodeFormat = BarcodeFormat.all) -> String?{
         self.image = uiImage
-        self.barcodesToFilter = barcodesToFilter
+        self.barcodeToFilter = barcodeToFilter
         let rotationAttemptResult = tryRotateImage(uiImage)
         return rotationAttemptResult
         
@@ -45,17 +46,17 @@ class BarcodeScanner {
     private func decodeRotated90DegreesImage(uiImage: UIImage) ->String?{
         let rotated = uiImage.rotate(radians: .pi/2)
         self.image = rotated
-        return getBarcodeFromImage(uiImage: uiImage, barcodesToFilter: self.barcodesToFilter!)
+        return getBarcodeFromImage(uiImage: uiImage, barcodesToFilter: self.barcodeToFilter!)
     }
     
     private func decodeUnmodifiedImage(uiImage: UIImage) ->String?{
-        return getBarcodeFromImage(uiImage: uiImage, barcodesToFilter: self.barcodesToFilter!)
+        return getBarcodeFromImage(uiImage: uiImage, barcodesToFilter: self.barcodeToFilter!)
         
     }
     
     private func decodeCroppedPdf(uiImage: UIImage) ->String?{
         let cropped = uiImage.cropHalf()
-        return getBarcodeFromImage(uiImage: cropped, barcodesToFilter: self.barcodesToFilter!)
+        return getBarcodeFromImage(uiImage: cropped, barcodesToFilter: self.barcodeToFilter!)
         
     }
     
