@@ -20,7 +20,7 @@ func getBarcodeFromImage(uiImage: UIImage, barcodesToFilter: BarcodeFormat = [Ba
 }
 
 private func scanMlKit(_ image: UIImage, barcodesToFilter: BarcodeFormat) ->String?{
-    let barcodeOptions = BarcodeScannerOptions(formats: [barcodesToFilter])
+    let barcodeOptions = BarcodeScannerOptions(formats: barcodesToFilter)
     let barcodeScanner = BarcodeScanner.barcodeScanner(options: barcodeOptions)
 
     let visionImage = VisionImage(image: image)
