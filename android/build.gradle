@@ -28,7 +28,7 @@ rootProject.allprojects {
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 34
 
     defaultConfig {
         namespace 'br.com.popcode.barcode_finder'
@@ -40,6 +40,6 @@ android {
 }
 
 dependencies {
+    implementation 'com.google.mlkit:barcode-scanning:17.3.0'
     implementation 'com.github.barteksc:android-pdf-viewer:2.8.2'
-    implementation 'com.google.mlkit:barcode-scanning:17.2.0'
 }

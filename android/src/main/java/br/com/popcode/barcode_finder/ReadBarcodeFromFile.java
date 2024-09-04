@@ -21,8 +21,6 @@ import com.google.mlkit.vision.barcode.common.Barcode;
 import com.google.mlkit.vision.common.InputImage;
 import com.shockwave.pdfium.PdfDocument;
 import com.shockwave.pdfium.PdfiumCore;
-
-import java.util.ArrayList;
 import java.util.List;
 
 public class ReadBarcodeFromFile extends AsyncTask<Void, Void, String> {
@@ -36,19 +34,19 @@ public class ReadBarcodeFromFile extends AsyncTask<Void, Void, String> {
     private boolean outOfMemoryError = false;
     private final OnBarcodeReceivedListener listener;
     private final EntryType entryType;
-    private final ArrayList barcodeFormats;
+    private final String barcodeFormat;
 
     ReadBarcodeFromFile(OnBarcodeReceivedListener listener,
                         Context context,
                         Uri filePath,
                         EntryType entryType,
-                        ArrayList barcodeFormats
+                        String barcodeFormat
     ) {
         this.listener = listener;
         this.context = context;
         this.filePath = filePath;
         this.entryType = entryType;
-        this.barcodeFormats = barcodeFormats;
+        this.barcodeFormat = barcodeFormat;
     }
 
     private Bitmap resizeImage(Bitmap bitmap, int tryNumber){
@@ -65,7 +63,7 @@ public class ReadBarcodeFromFile extends AsyncTask<Void, Void, String> {
             while (tryNumber <= NUMBER_OF_ATTEMPTS && !outOfMemoryError) {
                 Bitmap bitmap;
                 if (entryType == EntryType.PDF) {
-                    bitmap = generateImageFromPdf(filePath, 0, tryNumber);
+                    bitmap = generateImageFromPdf(filePath, tryNumber);
                 } else {
                     bitmap = BitmapFactory.decodeFile(filePath.getPath());
                     bitmap = resizeImage(bitmap, tryNumber);
@@ -95,7 +93,7 @@ public class ReadBarcodeFromFile extends AsyncTask<Void, Void, String> {
         }
     }
 
-    private Bitmap generateImageFromPdf(Uri assetFileName, int numeroPagina, int tryNumber) {
+    private Bitmap generateImageFromPdf(Uri assetFileName, int tryNumber) {
         PdfiumCore pdfiumCore = new PdfiumCore(context);
         try {
             ParcelFileDescriptor parcelFileDescriptor;
@@ -103,11 +101,11 @@ public class ReadBarcodeFromFile extends AsyncTask<Void, Void, String> {
             parcelFileDescriptor = contentResolver.openFileDescriptor(assetFileName, "r",
                     null);
             PdfDocument pdfDocument = pdfiumCore.newDocument(parcelFileDescriptor);
-            pdfiumCore.openPage(pdfDocument, numeroPagina);
-            int width = pdfiumCore.getPageWidthPoint(pdfDocument, numeroPagina) * tryNumber;
-            int height = pdfiumCore.getPageHeightPoint(pdfDocument, numeroPagina) * tryNumber;
+            pdfiumCore.openPage(pdfDocument, 0);
+            int width = pdfiumCore.getPageWidthPoint(pdfDocument, 0) * tryNumber;
+            int height = pdfiumCore.getPageHeightPoint(pdfDocument, 0) * tryNumber;
             Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-            pdfiumCore.renderPageBitmap(pdfDocument, bmp, numeroPagina, 0, 0, width,
+            pdfiumCore.renderPageBitmap(pdfDocument, bmp, 0, 0, 0, width,
                     height);
             pdfiumCore.closeDocument(pdfDocument);
             return bmp;
@@ -123,11 +121,10 @@ public class ReadBarcodeFromFile extends AsyncTask<Void, Void, String> {
 
     private String scanImage(Bitmap bMap) {
         try {
-            if (!outOfMemoryError) {;
+            if (!outOfMemoryError) {
                 BarcodeScannerOptions options =
                         new BarcodeScannerOptions.Builder()
-                                .enableAllPotentialBarcodes()
-                        .build();
+                                .setBarcodeFormats(BarcodeType.findType(barcodeFormat).code).build();
                 BarcodeScanner scanner = BarcodeScanning.getClient(options);
                 Bitmap bmp = toGrayscale(bMap);
                 InputImage image = InputImage.fromBitmap(bmp, 0);
@@ -147,8 +144,7 @@ public class ReadBarcodeFromFile extends AsyncTask<Void, Void, String> {
                     Log.d("BarcodeTest", "Processing image...");
                 }
                 List<Barcode> barcodes = result.getResult();
-                if (!barcodes.isEmpty() && (barcodeFormats.isEmpty()
-                        || existBarcodeType(barcodes.get(0).getFormat()))){
+                if (!barcodes.isEmpty() && (existBarcodeType(barcodes.get(0).getFormat()))){
                     return barcodes.get(0).getRawValue();
                 }
             }
@@ -163,13 +159,11 @@ public class ReadBarcodeFromFile extends AsyncTask<Void, Void, String> {
     }
 
     private boolean existBarcodeType(int format){
-        for(Object f: barcodeFormats){
-            BarcodeType barcodeType = BarcodeType.findType(f.toString());
+        BarcodeType barcodeType = BarcodeType.findType(barcodeFormat);
             if (barcodeType != null && barcodeType.code == format) {
                 Log.d("BarcodeTest", "Barcode type is: "+barcodeType.name());
                 return true;
             }
-        }
         Log.d("BarcodeTest", "Barcode type not found on list");
         return false;
     }

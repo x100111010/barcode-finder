@@ -2,12 +2,10 @@ package br.com.popcode.barcode_finder;
 
 import android.content.Context;
 import android.net.Uri;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import io.flutter.plugin.common.MethodCall;
@@ -15,7 +13,7 @@ import io.flutter.plugin.common.MethodChannel;
 
 public class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
 
-    private Context context;
+    private final Context context;
 
     MethodCallHandlerImpl(Context context) {
         this.context = context;
@@ -25,17 +23,17 @@ public class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
     public void onMethodCall(@NonNull MethodCall call, final @NonNull MethodChannel.Result result) {
         HashMap arguments = (HashMap) call.arguments;
         String filePath = (String) arguments.get("filePath");
-        ArrayList barcodeFormats = (ArrayList) arguments.get("barcodeFormats");
+        String barcodeFormat = (String) arguments.get("barcodeFormat");
         if (call.method.equals("scan_pdf")) {
-            scanFile(result, filePath, EntryType.PDF, barcodeFormats);
+            scanFile(result, filePath, EntryType.PDF, barcodeFormat);
         } else if (call.method.equals("scan_image")) {
-            scanFile(result, filePath, EntryType.IMAGE, barcodeFormats);
+            scanFile(result, filePath, EntryType.IMAGE, barcodeFormat);
         } else {
             result.notImplemented();
         }
     }
 
-    private void scanFile(final @NonNull MethodChannel.Result result, String filePath, EntryType entryType, ArrayList barcodeFormats) {
+    private void scanFile(final @NonNull MethodChannel.Result result, String filePath, EntryType entryType, String barcodeFormat) {
         File file = new File(filePath);
         Uri uri = Uri.fromFile(file);
         ReadBarcodeFromFile readBarcodeFromFile = new ReadBarcodeFromFile(new OnBarcodeReceivedListener() {
@@ -53,7 +51,7 @@ public class MethodCallHandlerImpl implements MethodChannel.MethodCallHandler {
             public void onOutOfMemory() {
                 result.error("out-of-memory", "Out of memory", "");
             }
-        }, context, uri, entryType, barcodeFormats);
+        }, context, uri, entryType, barcodeFormat);
         readBarcodeFromFile.execute();
     }
 }
