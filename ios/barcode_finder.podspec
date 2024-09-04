@@ -22,4 +22,5 @@ A new flutter plugin project.
   s.swift_version = '5.0'
   s.dependency 'GoogleMLKit/BarcodeScanning', '~> 6.0.0'
   s.dependency 'ATBarSDK', '~> 1.4.1'
+  s.dependency 'ZXingObjC', '~> 3.6.9'
 end
