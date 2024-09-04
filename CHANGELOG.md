@@ -1,3 +1,7 @@
+## 0.0.6
+
+* fix: corrige dependencia do android
+
 ## 0.0.5
 
 * Upgrade `zxing-android-embedded` to 4.3.0
