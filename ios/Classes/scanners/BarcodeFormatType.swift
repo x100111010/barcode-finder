@@ -6,36 +6,28 @@
 //
 
 import Foundation
-import ZXingObjC
+import MLKitBarcodeScanning
 
 enum BarcodeFormatType {
-    case any, upcA, upcE, ean8, ean13, upcEanExtension, code39, code93,
-         code128, codabar, itf, qr, dataMatrix, aztec, pdf417, maxicode, rss14, rssexpanded
+    case all, code128, code39, code93, codaBar, dataMatrix, EAN13, EAN8, ITF, qrCode, UPCA, UPCE, PDF417, Aztec
     
-    
-    static func createBarcodeFormatTypeFromStrings(strings: [String]) ->[BarcodeFormatType]{
-        if strings.isEmpty{
-            return [BarcodeFormatType.any]
+    static func createBarcodeFormatTypeFromString(format: String) ->BarcodeFormatType{
+        if format.isEmpty {
+            return BarcodeFormatType.all
         }
-        var barcodeFormatTypes = Array<BarcodeFormatType>()
-        for name in strings{
-            barcodeFormatTypes.append(barcodeFormatTypeFromString(name))
-        }
-        return barcodeFormatTypes
+        return barcodeFormatTypeFromString(format)
     }
     
     static private func barcodeFormatTypeFromString(_ name: String) -> BarcodeFormatType{
         switch name {
         case "UPC_A":
-            return BarcodeFormatType.upcA
+            return BarcodeFormatType.UPCA
         case "UPC_E":
-            return BarcodeFormatType.upcE
+            return BarcodeFormatType.UPCE
         case "EAN_8":
-            return BarcodeFormatType.ean8
+            return BarcodeFormatType.EAN8
         case "EAN_13":
-            return BarcodeFormatType.ean13
-        case "UPC_EAN_EXTENSION":
-            return BarcodeFormatType.upcEanExtension
+            return BarcodeFormatType.EAN13
         case "CODE_39":
             return BarcodeFormatType.code39
         case "CODE_93":
@@ -43,25 +35,53 @@ enum BarcodeFormatType {
         case "CODE_128":
             return BarcodeFormatType.code128
         case "CODABAR":
-            return BarcodeFormatType.codabar
+            return BarcodeFormatType.codaBar
         case "ITF":
-            return BarcodeFormatType.itf
+            return BarcodeFormatType.ITF
         case "QR_CODE":
-            return BarcodeFormatType.qr
+            return BarcodeFormatType.qrCode
         case "DATA_MATRIX":
             return BarcodeFormatType.dataMatrix
         case "AZTEC":
-            return BarcodeFormatType.aztec
+            return BarcodeFormatType.Aztec
         case "PDF_417":
-            return BarcodeFormatType.pdf417
-        case "MAXICODE":
-            return BarcodeFormatType.maxicode
-        case "RSS_14":
-            return BarcodeFormatType.rss14
-        case "RSS_EXPANDED":
-            return BarcodeFormatType.rssexpanded
+            return BarcodeFormatType.PDF417
         default:
-            return BarcodeFormatType.any
+            return BarcodeFormatType.all
+        
+        }
+    }
+    
+    static func barcodeFromType(_ barcode: BarcodeFormatType) -> BarcodeFormat{
+        switch barcode {
+        case .UPCA:
+            return BarcodeFormat.UPCA
+        case .UPCE:
+            return BarcodeFormat.UPCE
+        case .EAN8:
+            return BarcodeFormat.EAN8
+        case . EAN13:
+            return BarcodeFormat.EAN13
+        case .code39:
+            return BarcodeFormat.code39
+        case .code93:
+            return BarcodeFormat.code93
+        case .code128:
+            return BarcodeFormat.code128
+        case .codaBar:
+            return BarcodeFormat.codaBar
+        case .ITF:
+            return BarcodeFormat.ITF
+        case .qrCode:
+            return BarcodeFormat.qrCode
+        case .dataMatrix:
+            return BarcodeFormat.dataMatrix
+        case .Aztec:
+            return BarcodeFormat.aztec
+        case .PDF417:
+            return BarcodeFormat.PDF417
+        default:
+            return BarcodeFormat.all
         
         }
     }

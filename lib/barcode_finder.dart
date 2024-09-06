@@ -7,13 +7,12 @@ abstract class BarcodeFinder {
   /// it will scan for all possible formats
   static Future<String?> scanFile({
     required String path,
-    List<BarcodeFormat> formats = const [],
+    BarcodeFormat format = BarcodeFormat.ALL,
   }) async {
     try {
-      final listFormats = _conventFormatsToList(formats);
       Map<String, dynamic> arguments = {
         'filePath': path,
-        'barcodeFormats': listFormats,
+        'barcodeFormat': format.name,
       };
       if (path.endsWith('.pdf')) {
         return _channel.invokeMethod('scan_pdf', arguments);
@@ -23,10 +22,6 @@ abstract class BarcodeFinder {
       throw Exception();
     }
   }
-
-  static List<String> _conventFormatsToList(List<BarcodeFormat> formats) {
-    return formats.map((format) => format.toString().split('.').last).toList();
-  }
 }
 
 enum BarcodeFormat {
@@ -34,7 +29,6 @@ enum BarcodeFormat {
   UPC_E,
   EAN_8,
   EAN_13,
-  UPC_EAN_EXTENSION,
   CODE_39,
   CODE_93,
   CODE_128,
@@ -44,7 +38,5 @@ enum BarcodeFormat {
   DATA_MATRIX,
   AZTEC,
   PDF_417,
-  MAXICODE,
-  RSS_14,
-  RSS_EXPANDED,
+  ALL,
 }

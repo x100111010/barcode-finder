@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodChannel;
+import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 
 public class BarcodeFinderPlugin implements FlutterPlugin {
     private MethodChannel channel;
@@ -17,7 +18,7 @@ public class BarcodeFinderPlugin implements FlutterPlugin {
     }
 
     private void setMethodCallHandler(Context context) {
-        MethodCallHandlerImpl methodCallHandler = new MethodCallHandlerImpl(context);
+        MethodChannel.MethodCallHandler methodCallHandler = (MethodCallHandler) new MethodCallHandlerImpl(context);
         channel.setMethodCallHandler(methodCallHandler);
     }
 
